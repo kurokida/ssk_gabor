@@ -76,16 +76,16 @@
 
   // 教示
   instImages = [
-    './instruction/csfexp.002.jpeg',
-    './instruction/csfexp.003.jpeg',
-    './instruction/csfexp.004.jpeg',
-    './instruction/csfexp.005.jpeg',
-    './instruction/csfexp.006.jpeg',
-    './instruction/csfexp.007.jpeg',
-  //'./instruction/csfexp.008.jpeg',
-  //'./instruction/csfexp.009.jpeg',
-  //'./instruction/csfexp.010.jpeg',
-  //'./instruction/csfexp.011.jpeg',
+    './instruction_Japanese/csfexp.002.jpeg',
+    './instruction_Japanese/csfexp.003.jpeg',
+    './instruction_Japanese/csfexp.004.jpeg',
+    './instruction_Japanese/csfexp.005.jpeg',
+    './instruction_Japanese/csfexp.006.jpeg',
+    './instruction_Japanese/csfexp.007.jpeg',
+  //'./instruction_Japanese/csfexp.008.jpeg',
+  //'./instruction_Japanese/csfexp.009.jpeg',
+  //'./instruction_Japanese/csfexp.010.jpeg',
+  //'./instruction_Japanese/csfexp.011.jpeg',
   ]
   for (let i = 0; i<6; i++){
     var trial = {
@@ -200,9 +200,9 @@
                 break;
           }
           if (phase == 1){
-            instStr = '<p>練習は終わりです。</p><img src="./instruction/csf'+String(phaseOrder[0])+'.jpeg"><p>セッション1を始めるにはエンターキーを押してください。</p>';
+            instStr = '<p>練習は終わりです。</p><img src="./instruction_Japanese/csf'+String(phaseOrder[0])+'.jpeg"><p>セッション1を始めるにはエンターキーを押してください。</p>';
           } else {
-            instStr = '<p>セッション'+String(phase-1)+'は終わりです。</p><img src="./instruction/csf'+String(phaseOrder[phase-1])+'.jpeg">'+
+            instStr = '<p>セッション'+String(phase-1)+'は終わりです。</p><img src="./instruction_Japanese/csf'+String(phaseOrder[phase-1])+'.jpeg">'+
               '<p>セッション'+String(phase)+'を始めるにはエンターキーを押してください。</p>';
           }
           repeatNum = 1;          
@@ -327,7 +327,7 @@
   
   jsPsych.init({
     timeline: experiment,
-    preload_images: ['./instruction/csf1.jpeg','./instruction/csf2.jpeg','./instruction/csf3.jpeg','./instruction/csf4.jpeg'],
+    preload_images: ['./instruction_Japanese/csf1.jpeg','./instruction_Japanese/csf2.jpeg','./instruction_Japanese/csf3.jpeg','./instruction_Japanese/csf4.jpeg'],
     on_finish: function() {
       //jsPsych.data.displayData();
       //jsPsych.data.get().localSave('csv','mydata.csv');
