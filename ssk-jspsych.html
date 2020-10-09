@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type"  content="text/html; charset=UTF-8">
+  <script src="./jspsych.js"></script>
+  <script src="./jspsych-survey-multi-choice.js"></script>
+  <script src="./jspsych-survey-text.js"></script>
+  <script src="./jspsych-image-keyboard-response.js"></script>
+  <script src="./jspsych-image-button-response.js"></script>
+  <script src="./jspsych-html-keyboard-response.js"></script>
+  <script src="./jspsych-survey-likert.js"></script>
+  <link rel="stylesheet" href="./jspsych.css"></link>
+  <style>
+    .text-left {
+            text-align: left;
+        }
+    body {
+      background-color: gray;
+    }
+  </style>
+</head>
+<body></body>
+<script>
+  var myrandID = jsPsych.randomization.randomID(8);
+
+  var datestr=new Date(); // 日時の情報
+
+  var experiment = []; // 初期化	
+
+  var page_1_options = ["その他・無回答", "男", "女"];
+  var multi_choice_block = {
+        preamble: '<div class="text-left">この度は、調査にご協力いただきありがとうございます。<br>まず、性別を選んで「次へ」をクリックしてください。</div>',
+        type: 'survey-multi-choice',
+        questions: [{prompt: 'あなたの<span class="josan-red">性別</span>を選択してください', options: page_1_options, required:true, horizontal:true}],
+        button_label: '次へ',
+        on_finish: function(data){
+            var arrayResponses = JSON.parse(data.responses); // responsesは文字列型で集計時に扱いにくいため、データを切り分けます。
+            if (arrayResponses.Q0 == "その他・無回答") {
+                jsPsych.data.addProperties({gender: 1});
+            } else if (arrayResponses.Q0 == "男") {
+                jsPsych.data.addProperties({gender: 2});
+            } else {
+                jsPsych.data.addProperties({gender: 3});
+            }
+
+            var month2 = datestr.getMonth()+1; // getMonthの戻り値は0から始まるため。
+            jsPsych.data.addProperties({
+                nichiji: datestr.getFullYear() + '-' + month2 + '-' + datestr.getDate() + '-' + datestr.getHours() + ':' + datestr.getMinutes() + ':' + datestr.getSeconds(), 
+                randomID: myrandID});
+        }
+  };
+
+  experiment.push(multi_choice_block);
+
+  var survey_block = {
+    type: 'survey-text',
+    questions: [
+        {prompt: 'あなたの年齢を半角数字で入力して「次へ」をクリックしてください。'},
+    ],
+    button_label: '次へ',
+    on_finish: function(data){
+        var arrayResponses = JSON.parse(data.responses); // responsesは文字列型で集計時に扱いにくいため、データを切り分けます。
+        jsPsych.data.addProperties({age: arrayResponses.Q0});
+    }
+  };
+  
+  experiment.push(survey_block);
+
+  var trial = {
+    type: 'html-keyboard-response',
+    stimulus: '<p>いまから実験の内容について説明をします。</p><p>説明は複数のページに分かれています。</p><p>次のページに進むにはスペースキーを押してください。</p>',
+    choices: [32],
+    //prompt: '<p>Does the color match the word? (Y or N)</p>'
+  }
+  experiment.push(trial);
+
+  // 教示
+  instImages = [
+    './instruction/csfexp.002.jpeg',
+    './instruction/csfexp.003.jpeg',
+    './instruction/csfexp.004.jpeg',
+    './instruction/csfexp.005.jpeg',
+    './instruction/csfexp.006.jpeg',
+    './instruction/csfexp.007.jpeg',
+  //'./instruction/csfexp.008.jpeg',
+  //'./instruction/csfexp.009.jpeg',
+  //'./instruction/csfexp.010.jpeg',
+  //'./instruction/csfexp.011.jpeg',
+  ]
+  for (let i = 0; i<6; i++){
+    var trial = {
+      //type: 'image-button-response',
+      type: 'image-keyboard-response',
+      prompt: '<p>次の画面に進むにはスペースキーを押してください。</p>',
+      stimulus: instImages[i],
+      choices: [32],
+      //trial_duration: 1000,
+      //response_ends_trial: false,
+      //choices: '次へ',
+    };
+    experiment.push(trial);
+  }
+  
+  var phaseOrder = jsPsych.randomization.shuffle([1, 2, 3, 4]); // 練習を含んでいない
+
+  for (let phase = 0; phase < 5; phase++) { // 練習＋本番4
+        trialCnt = 0; // phaseのたびにリセット
+        if (phase == 0) { // Practice
+            var imgFileNames = [ // 練習試行の画像は最初のセッションと同じ空間周波数
+              './others/'+String(phaseOrder[0])+'-100-1.bmp',
+              './others/'+String(phaseOrder[0])+'-100-2.bmp',
+            ];
+            repeatNum = 2;
+            instStr = '練習を始めるにはエンターキーを押してください。';
+        } else { // Experiment
+          switch (phaseOrder[phase-1]){ // phaseが1以上であることに注意
+            case 1:
+                var imgFileNames = [
+                  './0.5/1-3-1.bmp',
+                  './0.5/1-3-2.bmp',
+                  './0.5/1-8-1.bmp',
+                  './0.5/1-8-2.bmp',
+                  './0.5/1-13-1.bmp',
+                  './0.5/1-13-2.bmp',
+                  './0.5/1-18-1.bmp',
+                  './0.5/1-18-2.bmp',
+                  './0.5/1-23-1.bmp',
+                  './0.5/1-23-2.bmp',
+                  './0.5/1-28-1.bmp',
+                  './0.5/1-28-2.bmp',
+                  './0.5/1-33-1.bmp',
+                  './0.5/1-33-2.bmp',
+                ];
+                var scale = ["9", "19", "29", "39", "49"];
+                var calc = '57-18';
+                var calcSeikai = 3;
+                break;
+            case 2:
+                var imgFileNames = [
+                  './1/2-1-1.bmp',
+                  './1/2-1-2.bmp',
+                  './1/2-6-1.bmp',
+                  './1/2-6-2.bmp',
+                  './1/2-11-1.bmp',
+                  './1/2-11-2.bmp',
+                  './1/2-16-1.bmp',
+                  './1/2-16-2.bmp',
+                  './1/2-21-1.bmp',
+                  './1/2-21-2.bmp',
+                  './1/2-26-1.bmp',
+                  './1/2-26-2.bmp',
+                  './1/2-31-1.bmp',
+                  './1/2-31-2.bmp',
+                ];
+                var scale = ["18", "28", "38", "48", "58"];
+                var calc = '81-23';
+                var calcSeikai = 4;
+                break;
+            case 3:
+                var imgFileNames = [
+                  './2/3-1-1.bmp',
+                  './2/3-1-2.bmp',
+                  './2/3-6-1.bmp',
+                  './2/3-6-2.bmp',
+                  './2/3-11-1.bmp',
+                  './2/3-11-2.bmp',
+                  './2/3-16-1.bmp',
+                  './2/3-16-2.bmp',
+                  './2/3-21-1.bmp',
+                  './2/3-21-2.bmp',
+                  './2/3-26-1.bmp',
+                  './2/3-26-2.bmp',
+                  './2/3-31-1.bmp',
+                  './2/3-31-2.bmp',
+                ];
+                var scale = ["27", "37", "47", "57", "67"];
+                var calc = '92-35';
+                var calcSeikai = 3;
+                break;
+            case 4:
+                var imgFileNames = [
+                  './8/4-5-1.bmp',
+                  './8/4-5-2.bmp',
+                  './8/4-10-1.bmp',
+                  './8/4-10-2.bmp',
+                  './8/4-15-1.bmp',
+                  './8/4-15-2.bmp',
+                  './8/4-20-1.bmp',
+                  './8/4-20-2.bmp',
+                  './8/4-25-1.bmp',
+                  './8/4-25-2.bmp',
+                  './8/4-30-1.bmp',
+                  './8/4-30-2.bmp',
+                  './8/4-35-1.bmp',
+                  './8/4-35-2.bmp',
+                ];
+                var scale = ["27", "37", "47", "57", "67"];
+                var calc = '84-37';
+                var calcSeikai = 2;
+                break;
+          }
+          if (phase == 1){
+            instStr = '<p>練習は終わりです。</p><img src="./instruction/csf'+String(phaseOrder[0])+'.jpeg"><p>セッション1を始めるにはエンターキーを押してください。</p>';
+          } else {
+            instStr = '<p>セッション'+String(phase-1)+'は終わりです。</p><img src="./instruction/csf'+String(phaseOrder[phase-1])+'.jpeg">'+
+              '<p>セッション'+String(phase)+'を始めるにはエンターキーを押してください。</p>';
+          }
+          repeatNum = 1;          
+        }        
+
+        var trial = {
+          type: 'html-keyboard-response',
+          stimulus: instStr,
+          choices: [13],
+          //trial_duration: 1000,
+          //response_ends_trial: false,
+          //prompt: '<p>Does the color match the word? (Y or N)</p>'
+        }
+        experiment.push(trial);
+
+        var randImages = jsPsych.randomization.shuffle(imgFileNames);
+
+        for (let count = 0; count < repeatNum; count++) {
+          for (let i = 0; i < randImages.length; i++) {
+            
+            if ((phase != 0) && (trialCnt == randImages.length*repeatNum/2)){ // セッションの半分で計算問題
+              var likert_trial = {
+                type: 'survey-likert',
+                preamble: '次の計算をして回答してください。',
+                questions: [
+                    {prompt: calc, labels: scale, required: true},         
+                ],
+                data:{calcSeikai:calcSeikai},
+                on_finish: function(data){
+                    var arrayResponses = JSON.parse(data.responses); // responsesは文字列型で集計時に扱いにくいため、データを切り分けます。
+                    if (arrayResponses.Q0 == data.calcSeikai){
+                      //jsPsych.data.addProperties({calcLabel:1})
+                      data.seikai = 1;
+                    }else{
+                      //jsPsych.data.addProperties({calcLabel:0})
+                      data.seikai = 0;
+                      console.log(arrayResponses.Q0);
+                      console.log(calcSeikai);
+                    }
+                },
+                button_label: '次へ'
+              };
+              experiment.push(likert_trial);
+            }
+
+            var trial = {
+              type: 'html-keyboard-response',
+              stimulus: '<p>スペースキーを押してください。</p>',
+              choices: [32],
+              //prompt: '<p>Does the color match the word? (Y or N)</p>'
+            }
+            experiment.push(trial);
+
+            // ファイル名から条件番号を抽出
+            tmpStr = randImages[i].split("/");
+            // tmpStr = tmpStr[3].split(".");
+            tmpStr = tmpStr[2].split(".");
+            condStr = tmpStr[0].split("-");
+
+            // 凝視点
+            var trial = {
+              type: 'image-keyboard-response',
+              stimulus: './others/fix.bmp',
+              choices: jsPsych.NO_KEYS,
+              trial_duration: 500
+            };
+            experiment.push(trial);
+
+            // 刺激
+            var trial = {
+              type: 'image-keyboard-response',
+              stimulus: randImages[i],
+              choices: jsPsych.NO_KEYS,
+              trial_duration: 50
+            };
+            experiment.push(trial);
+
+            // ブランク            
+            var trial = {
+              type: 'html-keyboard-response',
+              stimulus: '<p> </p>',
+              choices: jsPsych.NO_KEYS,
+              trial_duration: 300
+            }
+            experiment.push(trial);
+
+            var trial = {
+              type: 'html-keyboard-response',
+              stimulus: '<p>どちらに傾いていましたか？</p>',
+              choices: [37, 39],
+              data: {
+                phase: phase,
+                repeat: count,
+                serial: i,
+                cpd:　Number(condStr[0]),
+                contrast: Number(condStr[1]),
+                LR: Number(condStr[2])
+              },
+              on_finish: function(data){
+                if (data.LR == 1) { // 左に傾いた刺激
+                  if (data.key_press == 37){ // 左と回答
+                    data.seikai = 1;
+                  } else {
+                    data.seikai = 0;
+                  }
+                } else { // 右に傾いた刺激
+                  if (data.key_press == 37){ // 左と回答
+                    data.seikai = 0;
+                  } else {
+                    data.seikai = 1;
+                  }
+                }
+              }
+              //prompt: '<p>Have you seen this face before? Y or N.</p>'
+            }
+            experiment.push(trial);
+
+            trialCnt = trialCnt + 1;
+          }
+        }
+  }
+  
+  jsPsych.init({
+    timeline: experiment,
+    preload_images: ['./instruction/csf1.jpeg','./instruction/csf2.jpeg','./instruction/csf3.jpeg','./instruction/csf4.jpeg'],
+    on_finish: function() {
+      //jsPsych.data.displayData();
+      //jsPsych.data.get().localSave('csv','mydata.csv');
+      saveData();
+      document.write('<p align="center">お疲れ様でした。以上で実験を終了いたします。作業完了コードは<br><font size="+3">XXXX</font><br>です。Yahoo!クラウドソーシング画面にお戻りいただき，絶対に間違えないようご入力ください。<br>ご協力いただきましてありがとうございました。</p>');
+    },
+    //default_iti: 250
+  });
+
+  function saveData() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'write_data_ssk.php'); // change 'write_data.php' to point to php script.
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+            if(xhr.status == 200){
+                //console.log(xhr.responseText);
+                var response = JSON.parse(xhr.responseText);
+                console.log(response.success);
+            }
+        };
+        xhr.send(jsPsych.data.get().json());
+    }
+</script>
+
+</html>
